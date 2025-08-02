@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "用户下单接口")
 public class OrderController {
 
-
     @Autowired
     private OrderService orderService;
 
@@ -46,7 +45,6 @@ public class OrderController {
 
     /**
      * 订单支付
-     *
      * @param ordersPaymentDTO
      * @return
      */
