@@ -12,6 +12,7 @@ import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.websocket.WebSocketService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhangke
@@ -44,7 +47,8 @@ public class OrderServiceImpl implements OrderService {
     private AddressBookMapper addressBookMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
-
+    @Autowired
+    private WebSocketService webSocketService;
 
 
     /**
@@ -161,6 +165,37 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+        // 使用WebSocket给服务端发送消息，通知服务端有新的订单
+        // 1)封装信息
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", 1);
+        map.put("orderId", ordersDB.getId());
+        map.put("message", "订单号: " + ordersDB.getNumber());
+        // 2)发送信息
+        webSocketService.sendToAllClient(JSONObject.toJSONString(map));
     }
 
+
+    /**
+     * 用户催单
+     * @param id : 订单id
+     */
+    @Override
+    public void reminder(Long id) {
+       // 1.查询订单id
+       Orders orders = orderMapper.getById(id);
+       // 2.判断当前订单是否存在，不存在则抛出异常
+        if (orders==null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        // 3.订单存在，通过WebSocket发送信息的服务端
+        // 1)封装消息
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", 2);
+        map.put("orderId", orders.getId());
+        map.put("message", "订单号: " + orders.getNumber());
+        // 2)发送消息
+        webSocketService.sendToAllClient(JSONObject.toJSONString(map));
+    }
 }

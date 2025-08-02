@@ -6,6 +6,7 @@ import com.sky.result.Result;
 import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.websocket.WebSocketService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,6 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
-
     /**
      * 用户下单
      * @param ordersSubmitDTO
@@ -55,6 +55,16 @@ public class OrderController {
         OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
         log.info("生成预支付交易单：{}", orderPaymentVO);
         return Result.success(orderPaymentVO);
+    }
+
+    /**
+     * 用户催单
+     * @param id
+     * @return
+     */
+    public Result reminder(@PathVariable(name = "id") Long id){
+        orderService.reminder(id);
+        return Result.success();
     }
 
 }
