@@ -6,6 +6,10 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Map;
+
 /**
  * desc
  *
@@ -25,4 +29,11 @@ public interface UserMapper {
 
     @Select("select * from user where id=#{userId}")
     User getById(Long userId);
+
+    /**
+     * 统计在一定日期范围的用户数量
+     * @param map
+     * @return
+     */
+    Integer countByMap(Map<String, Object> map);
 }

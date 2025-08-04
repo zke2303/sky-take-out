@@ -51,12 +51,12 @@ public class WebSocketService {
 
     /**
      * 接送客户端发送过来的信息
-     * @param session
+     * @param message
      * @param sid
      */
     @OnMessage
-    public void onMessage(Session session, @PathParam(value = "sid") String sid) {
-        log.info("收到来自客户端{}发来的信息：{}", sid, session);
+    public void onMessage(String message, @PathParam(value = "sid") String sid) {
+        log.info("收到来自客户端{}发来的信息：{}", sid, message);
     }
 
     /**
